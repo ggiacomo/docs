@@ -36,12 +36,12 @@ The Gemini CLI uses Google OAuth for authentication. On first run, it opens a br
 gemini auth login
 ```
 
-After authenticating, credentials are cached locally. The agent uses these cached credentials when invoking the Gemini CLI — no API key needs to be entered during `remoteagent init`.
+After authenticating, credentials are cached locally. The agent uses these cached credentials when invoking the Gemini CLI — no API key needs to be entered during `remoteagentchat init`.
 
 ## Setup
 
 ```bash
-remoteagent init --runner gemini
+remoteagentchat init --runner gemini
 ```
 
 Or choose `gemini` when prompted by the interactive wizard. Since no API key is required for the free tier, the wizard will skip the API key prompt.
@@ -81,5 +81,5 @@ gemini --version
 Restart the agent after updating:
 
 ```bash
-remoteagent start
+remoteagentchat start
 ```

@@ -17,7 +17,7 @@ The `custom` runner lets you connect RemoteAgent to any command-line tool that f
 Pass the path to your binary with the `--runner-bin` flag:
 
 ```bash
-remoteagent init --runner custom --runner-bin /path/to/your/binary
+remoteagentchat init --runner custom --runner-bin /path/to/your/binary
 ```
 
 The binary path is saved in `~/.remoteagent/agents/{agentId}.json` and used each time the agent receives a command.
@@ -53,7 +53,7 @@ Make it executable:
 
 ```bash
 chmod +x /usr/local/bin/my-ai-wrapper
-remoteagent init --runner custom --runner-bin /usr/local/bin/my-ai-wrapper
+remoteagentchat init --runner custom --runner-bin /usr/local/bin/my-ai-wrapper
 ```
 
 ## Example — Python script
@@ -85,7 +85,7 @@ for chunk in stream:
 
 ```bash
 chmod +x /usr/local/bin/openai-runner.py
-remoteagent init --runner custom --runner-bin /usr/local/bin/openai-runner.py
+remoteagentchat init --runner custom --runner-bin /usr/local/bin/openai-runner.py
 ```
 
 ## Example — Ollama wrapper
@@ -100,11 +100,11 @@ ollama run llama3.2 "$PROMPT"
 
 ## Passing environment variables
 
-If your binary needs environment variables (API keys, config paths), set them in the shell environment where you run `remoteagent start`. They are inherited by child processes:
+If your binary needs environment variables (API keys, config paths), set them in the shell environment where you run `remoteagentchat start`. They are inherited by child processes:
 
 ```bash
 export OPENAI_API_KEY=sk-...
-remoteagent start
+remoteagentchat start
 ```
 
 Alternatively, use a wrapper script that sets the variables before calling the real binary.

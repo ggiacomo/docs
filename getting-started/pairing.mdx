@@ -39,7 +39,7 @@ Navigate to your project directory and run:
 
 ```bash
 cd /path/to/your/project
-remoteagent init
+remoteagentchat init
 ```
 
 The wizard asks a few questions:
@@ -53,8 +53,8 @@ Once the code is accepted, the agent is linked to your Telegram account and star
 You can also pass flags to skip the interactive prompts:
 
 ```bash
-remoteagent init --runner claude-sdk
-remoteagent init --runner custom --runner-bin /usr/local/bin/my-ai-tool
+remoteagentchat init --runner claude-sdk
+remoteagentchat init --runner custom --runner-bin /usr/local/bin/my-ai-tool
 ```
 
 ## Step 4 — Send your first command
@@ -63,11 +63,11 @@ Your bot is now active. Open Telegram, find the **RemoteAgent bot**, and send an
 
 ## Pairing multiple projects
 
-You can pair as many agents as your plan allows by repeating this process in different project directories. Each `remoteagent init` creates a separate agent with a unique ID. See [Multi-project](/bot/multi-project) for details on how the bot handles routing between agents.
+You can pair as many agents as your plan allows by repeating this process in different project directories. Each `remoteagentchat init` creates a separate agent with a unique ID. See [Multi-project](/bot/multi-project) for details on how the bot handles routing between agents.
 
 ## Re-pairing an existing agent
 
-If you need to re-pair an agent (for example, after switching Telegram accounts), run `remoteagent init` again in the same directory. The wizard detects the existing configuration and asks whether to update it or create a new agent.
+If you need to re-pair an agent (for example, after switching Telegram accounts), run `remoteagentchat init` again in the same directory. The wizard detects the existing configuration and asks whether to update it or create a new agent.
 
 ## Where configuration is stored
 

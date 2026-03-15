@@ -13,10 +13,10 @@ The `claude-sdk` runner is the default and recommended choice for most users. It
 
 ## Setup
 
-During `remoteagent init`, select `claude-sdk` (or press Enter to accept the default). When prompted for your API key, paste your Anthropic key:
+During `remoteagentchat init`, select `claude-sdk` (or press Enter to accept the default). When prompted for your API key, paste your Anthropic key:
 
 ```bash
-remoteagent init
+remoteagentchat init
 # ? Which runner? claude-sdk
 # ? Anthropic API key: sk-ant-...
 ```
@@ -26,7 +26,7 @@ The key is saved to `~/.remoteagent/config.json` on your local machine. It is ne
 To use this runner from the command line without the interactive wizard:
 
 ```bash
-remoteagent init --runner claude-sdk
+remoteagentchat init --runner claude-sdk
 ```
 
 ## How it works

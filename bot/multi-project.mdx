@@ -7,11 +7,11 @@ RemoteAgent supports running multiple agents — one per project — all connect
 
 ## Registering a second agent
 
-Each agent is initialized in its own project directory. Navigate to the second project and run `remoteagent init`:
+Each agent is initialized in its own project directory. Navigate to the second project and run `remoteagentchat init`:
 
 ```bash
 cd /path/to/second-project
-remoteagent init
+remoteagentchat init
 ```
 
 Complete the wizard as usual. You will receive a new pairing code. Go to [remoteagent.chat/connect](https://remoteagent.chat/connect), log in with the same Telegram account, and enter the new code.
@@ -30,21 +30,21 @@ Each agent process runs independently on your machine. Navigate to the project d
 
 ```bash
 cd /path/to/first-project
-remoteagent start
+remoteagentchat start
 
 # In another terminal
 cd /path/to/second-project
-remoteagent start
+remoteagentchat start
 ```
 
 You can also start an agent by name from anywhere:
 
 ```bash
-remoteagent start "my-api"
-remoteagent start "frontend"
+remoteagentchat start "my-api"
+remoteagentchat start "frontend"
 ```
 
-The name matches the project name you assigned during `remoteagent init`.
+The name matches the project name you assigned during `remoteagentchat init`.
 
 ## How the bot routes commands
 
@@ -62,7 +62,7 @@ When you send a message to the bot, routing works as follows:
 
   Reply with the number to select a project. The bot remembers your last selection within a session, so you do not need to re-select for every message until you explicitly switch.
 
-- **All agents offline** — the bot notifies you that no agents are reachable and suggests running `remoteagent start`.
+- **All agents offline** — the bot notifies you that no agents are reachable and suggests running `remoteagentchat start`.
 
 ## Switching the active project
 
@@ -106,7 +106,7 @@ For agents on a server or a machine that stays on, consider running them as syst
 
 <CodeGroup>
   ```bash systemd (Linux)
-  # /etc/systemd/system/remoteagent-myapi.service
+  # /etc/systemd/system/remoteagentchat-myapi.service
   [Unit]
   Description=RemoteAgent — my-api
   After=network.target
@@ -114,7 +114,7 @@ For agents on a server or a machine that stays on, consider running them as syst
   [Service]
   User=youruser
   WorkingDirectory=/path/to/my-api
-  ExecStart=remoteagent start
+  ExecStart=remoteagentchat start
   Restart=on-failure
   RestartSec=5
 
@@ -123,8 +123,8 @@ For agents on a server or a machine that stays on, consider running them as syst
   ```
 
   ```bash pm2 (Node.js process manager)
-  pm2 start "remoteagent start" --name my-api --cwd /path/to/my-api
-  pm2 start "remoteagent start" --name frontend --cwd /path/to/frontend
+  pm2 start "remoteagentchat start" --name my-api --cwd /path/to/my-api
+  pm2 start "remoteagentchat start" --name frontend --cwd /path/to/frontend
   pm2 save
   pm2 startup
   ```

@@ -37,22 +37,22 @@ If you need to install or upgrade Node.js, the recommended approach is using a v
 
 ## Install RemoteAgent
 
-Install the package globally so the `remoteagent` command is available from any directory:
+Install the package globally so the `remoteagentchat` command is available from any directory:
 
 ```bash
-npm install -g remoteagent
+npm install -g remoteagentchat
 ```
 
 ### Verify the installation
 
 ```bash
-remoteagent --version
+remoteagentchat --version
 ```
 
 Expected output:
 
 ```
-remoteagent/x.y.z linux-x64 node-v20.x.x
+remoteagentchat/x.y.z linux-x64 node-v20.x.x
 ```
 
 If you see `command not found`, your npm global bin directory is not on your `PATH`. Fix it by adding the output of `npm config get prefix` followed by `/bin` to your shell profile:
@@ -71,11 +71,11 @@ source ~/.bashrc
 
 ## Runner prerequisites
 
-The `remoteagent` package itself has no runtime dependencies beyond Node.js. However, the AI runner you choose requires its own tooling installed separately.
+The `remoteagentchat` package itself has no runtime dependencies beyond Node.js. However, the AI runner you choose requires its own tooling installed separately.
 
 ### claude-sdk (default)
 
-No additional binary needed. The runner uses the `@anthropic-ai/claude-code` SDK in-process. You will need an **Anthropic API key**, which you provide during `remoteagent init` and is stored locally in `~/.remoteagent/config.json`.
+No additional binary needed. The runner uses the `@anthropic-ai/claude-code` SDK in-process. You will need an **Anthropic API key**, which you provide during `remoteagentchat init` and is stored locally in `~/.remoteagent/config.json`.
 
 ### claude-code
 
@@ -123,14 +123,14 @@ No specific prerequisites — any binary that reads from stdin and writes to std
 To update to the latest version of RemoteAgent:
 
 ```bash
-npm update -g remoteagent
-remoteagent --version
+npm update -g remoteagentchat
+remoteagentchat --version
 ```
 
 ## Uninstalling
 
 ```bash
-npm uninstall -g remoteagent
+npm uninstall -g remoteagentchat
 ```
 
 This removes the binary. Local configuration stored in `~/.remoteagent/` is not deleted automatically. Remove it manually if needed:

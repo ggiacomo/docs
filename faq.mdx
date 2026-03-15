@@ -10,7 +10,7 @@ description: "Answers to common questions about RemoteAgent setup, security, bil
     For always-on availability, run the agent on a server, a cloud VM, or a machine that stays powered. Use a process supervisor like `pm2` or `systemd` to restart the agent automatically after reboots or crashes.
 
     ```bash
-    pm2 start "remoteagent start" --name my-project --cwd /path/to/project
+    pm2 start "remoteagentchat start" --name my-project --cwd /path/to/project
     pm2 startup
     pm2 save
     ```
@@ -37,7 +37,7 @@ description: "Answers to common questions about RemoteAgent setup, security, bil
   </Accordion>
 
   <Accordion title="Can I use multiple projects?">
-    Yes. Run `remoteagent init` in each project directory to register a new agent. Each agent gets a unique ID and appears as a separate entry in the bot and dashboard.
+    Yes. Run `remoteagentchat init` in each project directory to register a new agent. Each agent gets a unique ID and appears as a separate entry in the bot and dashboard.
 
     The number of projects you can register depends on your plan:
     - **Trial / Pro / Team** — unlimited projects
@@ -61,7 +61,7 @@ description: "Answers to common questions about RemoteAgent setup, security, bil
   <Accordion title="What if my agent goes offline?">
     The bot sends you a Telegram notification immediately when an agent disconnects. The notification includes the project name and a timestamp.
 
-    To bring the agent back online, run `remoteagent start` in your project directory, or by name: `remoteagent start "project-name"`.
+    To bring the agent back online, run `remoteagentchat start` in your project directory, or by name: `remoteagent start "project-name"`.
 
     To prevent unplanned downtime, run the agent under a process supervisor that restarts it automatically. See [Offline alerts](/bot/offline-alerts) for setup examples.
 
@@ -72,14 +72,14 @@ description: "Answers to common questions about RemoteAgent setup, security, bil
     Update the global npm package:
 
     ```bash
-    npm update -g remoteagent
-    remoteagent --version
+    npm update -g remoteagentchat
+    remoteagentchat --version
     ```
 
     Then restart the agent:
 
     ```bash
-    remoteagent start
+    remoteagentchat start
     ```
 
     Updates to the agent package are backward-compatible. Your existing config files and paired agents continue to work after an update.
@@ -118,7 +118,7 @@ description: "Answers to common questions about RemoteAgent setup, security, bil
   </Accordion>
 
   <Accordion title="Does RemoteAgent work on Windows?">
-    The agent is supported on Windows via **WSL 2** (Windows Subsystem for Linux). Install WSL 2, then install Node.js inside the WSL environment and run `remoteagent` from there.
+    The agent is supported on Windows via **WSL 2** (Windows Subsystem for Linux). Install WSL 2, then install Node.js inside the WSL environment and run `remoteagentchat` from there.
 
     Native Windows support (PowerShell/CMD) is not officially tested or guaranteed. WSL 2 is the recommended path for Windows users.
   </Accordion>

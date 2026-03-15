@@ -3,7 +3,7 @@ title: "Runners overview"
 description: "RemoteAgent supports multiple AI runners. Choose the one that fits your workflow, API access, and model preferences."
 ---
 
-A **runner** is the AI engine that processes your prompts. RemoteAgent acts as the relay — the runner is what actually reads your code, reasons about it, and produces output. You choose a runner once during `remoteagent init`, and you can change it at any time by re-running init.
+A **runner** is the AI engine that processes your prompts. RemoteAgent acts as the relay — the runner is what actually reads your code, reasons about it, and produces output. You choose a runner once during `remoteagentchat init`, and you can change it at any time by re-running init.
 
 ## Comparison table
 
@@ -18,27 +18,27 @@ A **runner** is the AI engine that processes your prompts. RemoteAgent acts as t
 
 ## How to select a runner
 
-Pass the `--runner` flag to `remoteagent init`:
+Pass the `--runner` flag to `remoteagentchat init`:
 
 ```bash
-remoteagent init --runner claude-sdk       # default
-remoteagent init --runner claude-code
-remoteagent init --runner gemini
-remoteagent init --runner aider
-remoteagent init --runner openclaw
-remoteagent init --runner custom --runner-bin /path/to/binary
+remoteagentchat init --runner claude-sdk       # default
+remoteagentchat init --runner claude-code
+remoteagentchat init --runner gemini
+remoteagentchat init --runner aider
+remoteagentchat init --runner openclaw
+remoteagentchat init --runner custom --runner-bin /path/to/binary
 ```
 
 Without a flag, the wizard prompts you interactively.
 
 ## Switching runners
 
-To change the runner for an existing agent, run `remoteagent init` again in the same project directory. The wizard detects your existing configuration and lets you update the runner without regenerating a new pairing code (the agent is already paired).
+To change the runner for an existing agent, run `remoteagentchat init` again in the same project directory. The wizard detects your existing configuration and lets you update the runner without regenerating a new pairing code (the agent is already paired).
 
 Restart the agent after changing the runner:
 
 ```bash
-remoteagent start
+remoteagentchat start
 ```
 
 ## Runner architecture

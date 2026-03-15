@@ -99,7 +99,7 @@ The database is not involved in the real-time message relay path. It is only rea
 ## Pairing flow
 
 ```
-1. remoteagent init
+1. remoteagentchat init
    → POST /api/pair { projectName }
    → Server generates pairing code, stores in DB with 10-minute TTL
    → Returns { code: "XK9-4TZ" } to CLI

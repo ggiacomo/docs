@@ -7,7 +7,7 @@ RemoteAgent is a lightweight relay that connects any AI coding agent running on 
 
 There is no cloud IDE, no remote execution environment, and no server you need to manage. Your agent runs on your own machine, with your own API keys, in your own project directory. RemoteAgent is purely a relay: it never sees your source code, your prompts in full context, or your API credentials.
 
-The setup takes under five minutes. Install the npm package, run `remoteagent init`, open [remoteagent.chat/connect](https://remoteagent.chat/connect) on your phone, enter the pairing code, and you're done.
+The setup takes under five minutes. Install the npm package, run `remoteagentchat init`, open [remoteagent.chat/connect](https://remoteagent.chat/connect) on your phone, enter the pairing code, and you're done.
 
 <CardGroup cols={2}>
   <Card title="Any AI runner" icon="robot">
@@ -33,8 +33,8 @@ The setup takes under five minutes. Install the npm package, run `remoteagent in
 
 ## How it works
 
-1. You install `remoteagent` globally on the machine where your AI agent will run.
-2. You run `remoteagent init`, choose your AI runner, and receive a short pairing code.
+1. You install `remoteagentchat` globally on the machine where your AI agent will run.
+2. You run `remoteagentchat init`, choose your AI runner, and receive a short pairing code.
 3. You open [remoteagent.chat/connect](https://remoteagent.chat/connect), log in with the Telegram widget, and enter the code. The bot is now linked to your agent.
 4. From that point on, any message you send to the bot is forwarded to your agent. Output streams back to Telegram as it is produced.
 

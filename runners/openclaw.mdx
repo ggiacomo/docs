@@ -20,14 +20,14 @@ Start your gateway first, then initialize the agent:
 openclaw start --port 18789
 
 # 2. Initialize the agent
-remoteagent init --runner openclaw
+remoteagentchat init --runner openclaw
 ```
 
 Or choose `openclaw` when prompted by the interactive wizard.
 
 <Warning>
   The agent will fail to start if the gateway is not reachable at
-  `localhost:18789` when `remoteagent start` is run. Always start the gateway
+  `localhost:18789` when `remoteagentchat start` is run. Always start the gateway
   before starting the agent.
 </Warning>
 
@@ -63,7 +63,7 @@ If your gateway expects a specific model name, you can configure it in the per-a
 Edit this file and restart the agent:
 
 ```bash
-remoteagent start
+remoteagentchat start
 ```
 
 ## Use cases

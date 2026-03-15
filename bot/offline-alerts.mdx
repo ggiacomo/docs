@@ -13,7 +13,7 @@ When an agent starts, it establishes a subscription to its Redis command channel
 Your agent "my-api" went offline.
 Last seen: just now
 
-Run remoteagent start in your project directory to bring it back.
+Run remoteagentchat start in your project directory to bring it back.
 ```
 
 ## Plan availability
@@ -33,13 +33,13 @@ When you receive an offline alert, restart the agent on your machine:
 
 ```bash
 cd /path/to/your/project
-remoteagent start
+remoteagentchat start
 ```
 
 Or by project name from any directory:
 
 ```bash
-remoteagent start "my-api"
+remoteagentchat start "my-api"
 ```
 
 The agent reconnects to the Redis channel and immediately resumes accepting commands. The bot sends a confirmation:
@@ -60,17 +60,17 @@ To minimize downtime without manual intervention, run the agent as a supervised 
 
 <CodeGroup>
   ```bash pm2
-  pm2 start "remoteagent start" --name my-api --cwd /path/to/project
+  pm2 start "remoteagentchat start" --name my-api --cwd /path/to/project
   pm2 save
   pm2 startup
   # Follow the instructions pm2 prints to enable startup on boot
   ```
 
   ```bash systemd
-  # Create /etc/systemd/system/remoteagent-myapi.service
+  # Create /etc/systemd/system/remoteagentchat-myapi.service
   # (see the Multi-project page for the full unit file)
-  systemctl enable remoteagent-myapi
-  systemctl start remoteagent-myapi
+  systemctl enable remoteagentchat-myapi
+  systemctl start remoteagentchat-myapi
   ```
 </CodeGroup>
 
