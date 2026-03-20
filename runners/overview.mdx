@@ -9,12 +9,12 @@ A **runner** is the AI engine that processes your prompts. RemoteAgent acts as t
 
 | Runner | Type | Status | Requires | Best for |
 |---|---|---|---|---|
-| `claude-sdk` | In-process SDK | Stable | Anthropic API key | Best quality, default choice |
+| `opencode` | CLI binary | Stable | nothing (or optional API key) | Default choice, no API key needed, 75+ providers |
+| `claude-sdk` | In-process SDK | Stable | Anthropic API key | Best quality with Anthropic models |
 | `claude-code` | CLI binary | Stable | `claude` CLI + API key | Same capability, external process |
 | `gemini` | CLI binary | Beta | Google account (free tier available) | No-cost option for Gemini models |
-| `aider` | CLI binary | Beta | Python, pip, model API key | Multi-model, open-source flexibility |
-| `opencode` | CLI binary | Beta | Node.js, model API key | Open-source, multi-provider |
-| `openclaw` | HTTP gateway | Stable | OpenClaw running on localhost:18789 | Self-hosted AI gateway |
+| `aider` | CLI binary | Beta | Python, pip, model API key | model selection + architect mode via wizard |
+| `openclaw` | HTTP gateway | Stable | openclaw daemon running (configure with openclaw's own wizard first) | Self-hosted AI gateway |
 | `custom` | CLI binary | Stable | Your binary on PATH | Any AI tool with stdin/stdout interface |
 
 ## How to select a runner
@@ -22,16 +22,16 @@ A **runner** is the AI engine that processes your prompts. RemoteAgent acts as t
 Pass the `--runner` flag to `remoteagent init`:
 
 ```bash
-remoteagent init --runner claude-sdk       # default
+remoteagent init --runner opencode       # default — no API key required
+remoteagent init --runner claude-sdk
 remoteagent init --runner claude-code
 remoteagent init --runner gemini
 remoteagent init --runner aider
-remoteagent init --runner opencode
 remoteagent init --runner openclaw
 remoteagent init --runner custom --runner-bin /path/to/binary
 ```
 
-Without a flag, the wizard prompts you interactively.
+Without a flag, the wizard prompts you interactively. opencode is listed first and is the recommended default.
 
 ## Switching runners
 

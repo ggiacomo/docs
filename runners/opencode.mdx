@@ -1,9 +1,9 @@
 ---
 title: "opencode"
-description: "Use OpenCode as the AI runner — open-source terminal AI coding agent by the SST team, supports multiple providers."
+description: "Use OpenCode as the default AI runner — open-source terminal AI coding agent by the SST team, supports 75+ providers with no API key required."
 ---
 
-[OpenCode](https://opencode.ai) is an open-source terminal-based AI coding agent built by the SST team. The `opencode` runner invokes `opencode run` as a subprocess, allowing you to use it non-interactively with any supported AI provider.
+[OpenCode](https://opencode.ai) is an open-source terminal-based AI coding agent built by the SST team. It is the **default recommended runner** for RemoteAgent. The `opencode` runner invokes `opencode run` as a subprocess and supports over 75 AI providers — including GitHub Copilot and local models via Ollama — with no API key required to get started.
 
 ## Requirements
 
@@ -22,21 +22,15 @@ Verify the installation:
 opencode --version
 ```
 
-## Model and API key configuration
+## No API key required
 
-OpenCode reads model configuration from environment variables. Set your preferred provider's API key before using it with RemoteAgent.
+OpenCode works out of the box with:
 
-<CodeGroup>
-  ```bash Anthropic
-  export ANTHROPIC_API_KEY=sk-ant-...
-  ```
+- **GitHub Copilot** — if you have an active Copilot subscription, opencode will use it automatically
+- **Local models via Ollama** — run models entirely offline with no external API
+- **OpenCode Go subscription** — opencode's own hosted model access
 
-  ```bash OpenAI
-  export OPENAI_API_KEY=sk-...
-  ```
-</CodeGroup>
-
-To specify a model, use the `--model` flag or configure it in your OpenCode settings. See [OpenCode's documentation](https://opencode.ai/docs) for the full list of supported providers.
+If you want to use a specific cloud provider (Anthropic, OpenAI, etc.), you can optionally supply an API key. But it is not required to start.
 
 ## Setup
 
@@ -44,26 +38,46 @@ To specify a model, use the `--model` flag or configure it in your OpenCode sett
 remoteagent init --runner opencode
 ```
 
-Or choose `opencode` when prompted by the interactive wizard. No API key is collected by RemoteAgent — OpenCode reads its own credentials from environment variables.
+Or choose `opencode` when prompted by the interactive wizard (it is listed first as the recommended default).
+
+During `remoteagent init`, the wizard will ask:
+
+- **API key** — optional; press Enter to skip if you are using Copilot, Ollama, or OpenCode Go
+- **Default model** (e.g. `anthropic/claude-sonnet-4-5`) — optional; leave blank to use opencode's own default
+- **Small model for lightweight tasks** — optional
+- **Multiagent mode** — yes/no
 
 ## How it works
+
+RemoteAgent injects configuration at runtime using the `OPENCODE_CONFIG_CONTENT` environment variable — opencode's native config injection mechanism. RemoteAgent does not write any config files to disk.
 
 The runner executes:
 
 ```bash
-opencode run "<prompt>"
+OPENCODE_CONFIG_CONTENT='{"model":"...","providers":{...}}' opencode run "<prompt>"
 ```
 
+Only the settings collected during the wizard are injected. Any additional opencode configuration you set in your own `opencode.json` file will be picked up by opencode automatically — RemoteAgent does not interfere with it.
+
 Output from stdout is streamed back to the Redis output channel as it arrives.
+
+## OpenCode's own configuration
+
+opencode has a rich native configuration system (`opencode.json`). Any settings not exposed in the RemoteAgent wizard — custom keybindings, themes, provider-specific options, agent behaviors — can be configured directly in that file. opencode reads it automatically on every run.
+
+See [OpenCode's documentation](https://opencode.ai/docs) for the full list of supported configuration options and providers.
 
 ## Pros and cons
 
 | Pros | Cons |
 |---|---|
-| Open-source and auditable | Beta status — edge cases may exist |
-| Supports multiple AI providers | Requires Node.js environment |
-| No vendor lock-in | Less battle-tested than claude-sdk or aider |
-| Active development by SST team | |
+| No API key required — recommended default | Beta output parsing in some edge cases |
+| 75+ supported providers | Requires Node.js environment |
+| Works with GitHub Copilot and local models | — |
+| Open-source and auditable | — |
+| No vendor lock-in | — |
+| Active development by SST team | — |
+| Config injected via env var — no file conflicts | — |
 
 ## Updating OpenCode
 

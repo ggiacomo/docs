@@ -58,20 +58,30 @@ You can also create an `~/.aider.conf.yml` file to set defaults permanently. See
 remoteagent init --runner aider
 ```
 
-Or choose `aider` when prompted by the interactive wizard. No API key is collected by RemoteAgent — Aider reads its own credentials from environment variables.
+Or choose `aider` when prompted by the interactive wizard.
+
+During `remoteagent init`, the wizard will ask for:
+
+- **API key** — saved and passed to Aider via environment variable
+- **Model** (e.g. `claude-3-5-sonnet-20241022`, `gpt-4o`) — saved and passed as the `--model` flag on every run
+- **Architect mode** (yes/no) — if enabled, the `--architect` flag is appended to every invocation
+
+These settings are saved in `~/.remoteagent/agents/{agentId}.json` and applied automatically on every run.
 
 ## How it works
 
 The runner executes:
 
 ```bash
-aider --message "<prompt>" --no-auto-commits --yes
+aider --message "<prompt>" --no-auto-commits --yes [--model <model>] [--architect]
 ```
 
 Key flags:
 - `--message` passes the prompt non-interactively
 - `--no-auto-commits` prevents Aider from committing changes automatically (you remain in control of your git history)
 - `--yes` answers any confirmation prompts automatically (required for non-interactive operation)
+- `--model <model>` is included if a model was specified during init
+- `--architect` is included if architect mode was enabled during init
 
 Output from stdout is streamed back to the Redis output channel as it arrives.
 
@@ -90,8 +100,9 @@ git status
 |---|---|
 | Open-source and auditable | Beta status — edge cases in output parsing |
 | Works with many model providers | Requires Python environment |
-| Supports local models via Ollama | More setup steps than claude-sdk |
-| No vendor lock-in | `--no-auto-commits` disables a key Aider feature |
+| Supports local models via Ollama | More setup steps than opencode |
+| Model and architect mode configurable via wizard | `--no-auto-commits` disables a key Aider feature |
+| No vendor lock-in | — |
 
 ## Updating Aider
 

@@ -1,39 +1,53 @@
 ---
 title: "openclaw"
-description: "Connect RemoteAgent to a self-hosted AI gateway via the OpenClaw HTTP interface on localhost:18789."
+description: "Connect RemoteAgent to a self-hosted AI gateway via the OpenClaw HTTP interface."
 ---
 
-The `openclaw` runner connects to a locally running HTTP gateway that exposes an OpenAI-compatible API on `localhost:18789`. This is designed for self-hosted AI setups where you run your own model gateway — for example, a local proxy that routes to multiple models, applies rate limiting, or enforces custom policies.
+The `openclaw` runner connects to a locally running OpenClaw daemon that exposes an AI gateway on a configurable port (default `18789`). OpenClaw manages its own configuration entirely via its own setup wizard — RemoteAgent does not configure OpenClaw settings.
 
 ## Requirements
 
-- An OpenClaw-compatible gateway running and listening on `localhost:18789` before the agent starts.
-- The gateway must implement an OpenAI-compatible `/v1/chat/completions` endpoint.
-- Node.js 20 or later.
+- OpenClaw installed and its daemon running before `remoteagent init`
+- Node.js 20 or later
+
+## Setting up OpenClaw first
+
+Before running `remoteagent init`, you must set up OpenClaw independently:
+
+```bash
+npm install -g openclaw@latest
+openclaw onboard --install-daemon
+```
+
+`openclaw onboard --install-daemon` will walk you through OpenClaw's own configuration wizard and install the background daemon. Once the daemon is running, you can proceed to initialize RemoteAgent.
+
+<Warning>
+  Run `openclaw onboard --install-daemon` before `remoteagent init`. The
+  RemoteAgent wizard checks whether the daemon is reachable and will show
+  instructions if it is not found.
+</Warning>
 
 ## Setup
 
-Start your gateway first, then initialize the agent:
+Once the OpenClaw daemon is running, initialize the agent:
 
 ```bash
-# 1. Start the gateway (example — replace with your actual command)
-openclaw start --port 18789
-
-# 2. Initialize the agent
 remoteagent init --runner openclaw
 ```
 
 Or choose `openclaw` when prompted by the interactive wizard.
 
-<Warning>
-  The agent will fail to start if the gateway is not reachable at
-  `localhost:18789` when `remoteagent start` is run. Always start the gateway
-  before starting the agent.
-</Warning>
+During `remoteagent init`, the wizard will:
+
+1. Ask for the **gateway port** (default `18789`)
+2. Check whether the OpenClaw daemon is reachable on that port
+3. If the daemon is not found: display setup instructions and offer to exit or continue anyway
+
+RemoteAgent does not configure any OpenClaw settings — all model routing, API keys, and gateway behavior are managed through OpenClaw's own configuration.
 
 ## How it works
 
-The runner sends POST requests to `http://localhost:18789/v1/chat/completions` using the OpenAI API format. The prompt is sent as a user message. Response chunks are streamed via server-sent events (SSE) and forwarded to the Redis output channel as they arrive.
+The runner sends POST requests to `http://localhost:{port}/v1/chat/completions` using the OpenAI API format. The port is configurable and saved in `~/.remoteagent/agents/{agentId}.json`. The prompt is sent as a user message. Response chunks are streamed via server-sent events (SSE) and forwarded to the Redis output channel as they arrive.
 
 Example request body sent by the runner:
 
@@ -47,24 +61,7 @@ Example request body sent by the runner:
 }
 ```
 
-The `model` field defaults to `"default"` — your gateway is responsible for routing that to the appropriate backend model.
-
-## Configuring the model
-
-If your gateway expects a specific model name, you can configure it in the per-agent config file at `~/.remoteagent/agents/{agentId}.json`:
-
-```json
-{
-  "runner": "openclaw",
-  "runnerModel": "llama3.2-70b"
-}
-```
-
-Edit this file and restart the agent:
-
-```bash
-remoteagent start
-```
+The `model` field defaults to `"default"` — OpenClaw is responsible for routing that to the appropriate backend model.
 
 ## Use cases
 
@@ -77,7 +74,8 @@ remoteagent start
 
 | Pros | Cons |
 |---|---|
-| Full control over the AI backend | Requires running and maintaining a gateway |
-| Works with any OpenAI-compatible model | Gateway must be running before the agent starts |
+| Full control over the AI backend | Requires running and maintaining the OpenClaw daemon |
+| Works with any OpenAI-compatible model | OpenClaw daemon must be running before the agent starts |
 | Air-gap compatible | More setup complexity |
 | No API key managed by RemoteAgent | — |
+| OpenClaw handles all its own configuration | — |
