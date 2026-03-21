@@ -86,7 +86,13 @@ No specific prerequisites — any binary that reads from stdin and writes to std
 
 ## Updating
 
-To update to the latest version of RemoteAgent, re-run the install command:
+The easiest way to update is with the built-in reinstall command, which updates the binary and automatically restarts any running agents:
+
+```bash
+remoteagent reinstall
+```
+
+Or re-run the install script manually (you'll need to restart agents yourself afterwards):
 
 ```bash
 curl -fsSL https://remoteagent.chat/install | bash
