@@ -66,6 +66,17 @@ This stores a session credential managed by the `claude` CLI itself. Sessions ex
   It is not portable across machines, unlike the OAuth token.
 </Note>
 
+### Option C — API key via environment variable
+
+If you have an `ANTHROPIC_API_KEY` set in your environment, the `claude` binary will use it automatically.
+
+<Warning>
+  `ANTHROPIC_API_KEY` takes **precedence over your subscription** — it overrides
+  both the OAuth token and `claude login`, even if you have an active Pro/Max plan.
+  If you want to authenticate via subscription, make sure `ANTHROPIC_API_KEY` is
+  **not set** in your environment (or in `~/.zshrc` / `~/.bash_profile`).
+</Warning>
+
 ## Difference from claude-sdk
 
 Both runners use the same underlying Claude model and produce equivalent output. The key differences are:
