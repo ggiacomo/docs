@@ -28,7 +28,7 @@ OpenCode works out of the box with:
 
 - **GitHub Copilot** — if you have an active Copilot subscription, opencode will use it automatically
 - **Local models via Ollama** — run models entirely offline with no external API
-- **OpenCode Go subscription** — opencode's own hosted model access
+- **OpenCode Zen** — opencode's own hosted model access: pay-as-you-go, 37+ models, no provider key needed. Get your key at [opencode.ai/auth](https://opencode.ai/auth)
 
 If you want to use a specific cloud provider (Anthropic, OpenAI, etc.), you can optionally supply an API key. But it is not required to start.
 
@@ -42,7 +42,10 @@ Or choose `opencode` when prompted by the interactive wizard (it is listed first
 
 During `remoteagent init`, the wizard will ask:
 
-- **API key** — optional; press Enter to skip if you are using Copilot, Ollama, or OpenCode Go
+- **API key** — optional; choose from:
+  - *Skip* — not needed if you are using GitHub Copilot, a local model, or another pre-configured provider
+  - *OpenCode Zen* — pay-as-you-go access to 37+ models, no separate provider key needed. Get your key at [opencode.ai/auth](https://opencode.ai/auth)
+  - *Anthropic / OpenAI / Google* — paste your provider API key
 - **Default model** (e.g. `anthropic/claude-sonnet-4-5`) — optional; leave blank to use opencode's own default
 - **Small model for lightweight tasks** — optional
 - **Multiagent mode** — yes/no
@@ -55,6 +58,19 @@ The runner executes:
 
 ```bash
 OPENCODE_CONFIG_CONTENT='{"model":"...","providers":{...}}' opencode run "<prompt>"
+```
+
+If you chose **OpenCode Zen** during `remoteagent init`, the provider block is injected automatically and the default model is set to `opencode/claude-sonnet-4-6`:
+
+```json
+{
+  "model": "opencode/claude-sonnet-4-6",
+  "provider": {
+    "opencode-zen": {
+      "options": { "apiKey": "<your-zen-key>" }
+    }
+  }
+}
 ```
 
 Only the settings collected during the wizard are injected. Any additional opencode configuration you set in your own `opencode.json` file will be picked up by opencode automatically — RemoteAgent does not interfere with it.
@@ -74,6 +90,7 @@ See [OpenCode's documentation](https://opencode.ai/docs) for the full list of su
 | No API key required — recommended default | Beta output parsing in some edge cases |
 | 75+ supported providers | Requires Node.js environment |
 | Works with GitHub Copilot and local models | — |
+| OpenCode Zen: 37+ models, pay-as-you-go, no provider key | — |
 | Open-source and auditable | — |
 | No vendor lock-in | — |
 | Active development by SST team | — |
