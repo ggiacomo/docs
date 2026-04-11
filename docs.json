@@ -60,7 +60,6 @@
             "pages": [
               "bot/sending-commands",
               "bot/multi-project",
-              "bot/team",
               "bot/offline-alerts"
             ]
           },

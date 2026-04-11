@@ -40,7 +40,7 @@ description: "Answers to common questions about RemoteAgent setup, security, bil
     Yes. Run `remoteagent init` in each project directory to register a new agent. Each agent gets a unique ID and appears as a separate entry in the bot and dashboard.
 
     The number of projects you can register depends on your plan:
-    - **Trial / Pro / Team** — unlimited projects
+    - **Trial / Pro** — unlimited projects
     - **Solo** — up to 3 projects
 
     When multiple agents are online, the bot asks which project to target when you send a command. You can also use `/project <name>` to select a specific project.
@@ -65,7 +65,7 @@ description: "Answers to common questions about RemoteAgent setup, security, bil
 
     To prevent unplanned downtime, run the agent under a process supervisor that restarts it automatically. See [Offline alerts](/bot/offline-alerts) for setup examples.
 
-    Offline alerts are available on the Trial, Solo, Pro, and Team plans.
+    Offline alerts are available on all plans.
   </Accordion>
 
   <Accordion title="How do I update the agent?">
@@ -86,15 +86,7 @@ description: "Answers to common questions about RemoteAgent setup, security, bil
   </Accordion>
 
   <Accordion title="Can multiple Telegram users control the same agent?">
-    Only on the **Team plan**, which allows up to 5 Telegram users (the owner plus 4 members). Each team member is invited by the owner via `/invite` in the bot or from the dashboard Team tab. Invite links expire after 7 days.
-
-    Each member operates independently:
-    - **Project switching** — each member selects their own active project with `/projects`. Switching does not affect other members.
-    - **Session awareness** — if a member sends a command while another member's session is already running, they receive a notification: *"@alice is currently working on: fix the login page"*. The command still runs.
-    - **History** — `/history` shows each member only their own sessions. The owner sees all sessions from all members.
-    - **Abort** — `/abort` only stops sessions you initiated.
-
-    On Solo and Pro plans, only the account owner's Telegram user can send commands.
+    Not currently. Only the account owner's Telegram user can send commands to agents.
   </Accordion>
 
   <Accordion title="How do I revoke access to a paired agent?">
