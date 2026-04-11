@@ -27,12 +27,12 @@ description: "From zero to a working Telegram-controlled AI agent in under five 
   </Step>
 
   <Step title="Install your runner (if needed)">
-    RemoteAgent supports multiple AI runners. The default is `claude-sdk` which runs in-process with no extra setup. Other runners require their own binary installed first.
+    RemoteAgent supports multiple AI runners. The default is `claude-code` — requires the `claude` CLI installed and authenticated. Other runners require their own binary installed first.
 
     | Runner | Prerequisite |
     |---|---|
+    | `claude-code` | `npm install -g @anthropic-ai/claude-code` + `claude login` |
     | `claude-sdk` | None — runs in-process. Needs an Anthropic API key. |
-    | `claude-code` | `npm install -g @anthropic-ai/claude-code` |
     | `opencode` | `npm install -g opencode-ai` |
     | `gemini` | `npm install -g @google/gemini-cli` |
     | `aider` | `pip install aider-chat` |
@@ -63,7 +63,7 @@ description: "From zero to a working Telegram-controlled AI agent in under five 
 
     The interactive wizard will ask you:
 
-    - **Runner** — which AI engine to use. Press Enter to accept the default (`claude-sdk`), or type a runner name.
+    - **Runner** — which AI engine to use. Press Enter to accept the default (`claude-code`), or type a runner name.
     - **API key** — only required for runners that need one. Stored locally in `~/.remoteagent/config.json`, never transmitted.
     - **Pairing code** — paste the code you got from the dashboard in the previous step.
 

@@ -3,7 +3,7 @@ title: "opencode"
 description: "Use OpenCode as the default AI runner — open-source terminal AI coding agent by the SST team, supports 75+ providers with no API key required."
 ---
 
-[OpenCode](https://opencode.ai) is an open-source terminal-based AI coding agent built by the SST team. It is the **default recommended runner** for RemoteAgent. The `opencode` runner invokes `opencode run` as a subprocess and supports over 75 AI providers — including GitHub Copilot and local models via Ollama — with no API key required to get started.
+[OpenCode](https://opencode.ai) is an open-source terminal-based AI coding agent built by the SST team. The `opencode` runner invokes `opencode run` as a subprocess and supports over 75 AI providers — including GitHub Copilot and local models via Ollama — with no API key required to get started.
 
 ## Requirements
 
@@ -37,7 +37,7 @@ If you want to use a specific cloud provider (Anthropic, OpenAI, etc.), you can 
 remoteagent init --runner opencode
 ```
 
-Or choose `opencode` when prompted by the interactive wizard (it is listed first as the recommended default).
+Or choose `opencode` when prompted by the interactive wizard.
 
 During `remoteagent init`, the wizard will ask:
 
@@ -87,7 +87,7 @@ See [OpenCode's documentation](https://opencode.ai/docs) for the full list of su
 | Pros | Cons |
 |---|---|
 | No API key required — recommended default | Beta output parsing in some edge cases |
-| 75+ supported providers | Requires Node.js environment |
+| 75+ supported providers | Requires OpenCode CLI installed (`npm install -g opencode-ai`) |
 | Works with GitHub Copilot and local models | — |
 | OpenCode Zen: 37+ models, pay-as-you-go, no provider key | — |
 | Open-source and auditable | — |
