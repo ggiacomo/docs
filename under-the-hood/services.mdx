@@ -1,91 +1,28 @@
 ---
 title: "Services"
-description: "The external services RemoteAgent depends on, and what role each one plays."
+description: "The categories of external services RemoteAgent depends on, and what role each one plays."
 ---
 
-RemoteAgent is built entirely on managed services — there is no custom infrastructure to provision or maintain. Every service used has a free tier, which means the infrastructure cost for the MVP is effectively $0/month.
+RemoteAgent is built entirely on managed services — there is no custom infrastructure to provision or maintain.
 
-## Vercel
+## Hosting and compute
 
-**Role:** Hosts the Next.js web app, API Routes, and cron jobs.
+Handles incoming webhook events, runs server-side logic, and executes scheduled tasks. All compute is serverless — functions wake on demand and exit when done. There is no always-on server process on the cloud side.
 
-All server-side logic runs as Vercel serverless functions:
+## Database
 
-- `POST /api/telegram` — receives Telegram webhook events, dispatches commands to Redis
-- `POST /api/pair` and `POST /api/pair/confirm` — handles the agent pairing flow
-- `GET /api/agents` and `DELETE /api/agents/:id` — agent management
-- `POST /api/stripe/checkout` and `POST /api/stripe/portal` — Stripe session creation
-- `POST /api/stripe/webhook` — handles Stripe billing events
-- `GET /api/cron/trial-reminders` — daily cron for trial expiry notifications
+Stores persistent state: user accounts, agent records, session history, and pairing codes. The database is not in the hot path for real-time message relay — it is only accessed for authentication, plan checks, session recording, and pairing lifecycle.
 
-Functions are deployed globally on Vercel's edge network. Cold starts are minimal because the functions are small and stateless.
+## Message broker
 
-**Free tier:** Vercel Hobby plan — sufficient for the MVP traffic volume.
-
-## Neon PostgreSQL
-
-**Role:** Primary database for persistent state.
-
-Tables: `users`, `agents`, `sessions`, `pairing_codes`.
-
-Neon is a serverless PostgreSQL provider with per-query billing and automatic scale-to-zero. The database is not in the hot path for real-time message relay — it is only accessed for authentication, plan checks, session recording, and pairing code lifecycle.
-
-**Free tier:** Neon free tier — 0.5 GB storage, sufficient for user and session data at MVP scale.
-
-## Redis (Upstash)
-
-**Role:** Real-time pub/sub relay between API Routes and the local agent.
-
-Two channel patterns:
-
-- `agent:{agentId}` — commands published by API Routes, subscribed to by the local agent
-- `output:{sessionId}` — output chunks published by the agent, subscribed to by the output forwarder Vercel function
-
-Redis is the only service involved in every message in both directions. Latency matters here — Upstash provides sub-10ms pub/sub with a serverless-compatible REST API (used by Vercel functions) and a native Redis protocol connection (used by the agent via `ioredis`).
-
-**Free tier:** Upstash free tier — 10,000 commands/day, sufficient for development and light production use. Upgrade to the pay-per-use tier for production.
+Provides the real-time pub/sub relay between the cloud and your local agent. This is the only service involved in every message in both directions. Low latency is important here — output chunks published by your agent are forwarded to Telegram as they arrive.
 
 ## Telegram
 
-**Role:** User interface for sending commands and receiving output.
+The user interface. RemoteAgent operates as a Telegram bot in webhook mode — Telegram pushes each incoming message to the server rather than the server polling for updates. Every webhook request is verified before processing.
 
-RemoteAgent uses the Telegram Bot API via [Grammy.js](https://grammy.dev). The bot runs in **webhook mode** — Telegram sends a POST request to `/api/telegram` for each incoming message. There is no polling, no persistent bot process, and no server-to-Telegram persistent connection.
+**Cost:** The Telegram Bot API is free with no usage fees.
 
-Grammy.js handles:
-- HMAC-SHA256 signature verification on every webhook request
-- Message parsing and routing
-- Sending and editing messages (for streaming output)
-- Inline keyboards (for plan upgrade buttons in trial reminders)
-- Telegram Login Widget verification (for the connect page)
+## Payments
 
-**Cost:** Free. The Telegram Bot API has no usage fees.
-
-## Stripe
-
-**Role:** Payment processing and subscription management.
-
-Stripe handles:
-- Hosted Checkout pages (no payment form to build or maintain)
-- Subscription lifecycle (creation, renewal, failure, cancellation)
-- Customer Portal (self-service billing management for users)
-- Webhook events for real-time plan updates
-
-Plan updates (upgrade, downgrade, cancellation, payment failure) are processed exclusively from Stripe webhook events — never from redirect URLs or client-side callbacks.
-
-**Free tier:** No monthly fee. Stripe charges a percentage per transaction (typically 2.9% + 30¢ for card payments).
-
-## Summary
-
-| Service | Role | Free tier |
-|---|---|---|
-| Vercel | Web app hosting, API Routes, cron | Hobby plan |
-| Neon PostgreSQL | Database | 0.5 GB |
-| Upstash Redis | Real-time relay (pub/sub) | 10k cmds/day |
-| Telegram Bot API | User interface | Free |
-| Stripe | Payments and subscriptions | No monthly fee |
-
-<Note>
-  All services are managed — no VMs, no containers, no Kubernetes. RemoteAgent
-  has zero custom infrastructure to maintain. Scale is handled automatically by
-  each provider.
-</Note>
+Handles subscription billing, hosted checkout, and customer self-service. Plan changes (upgrades, downgrades, cancellations, payment failures) are applied exclusively from payment provider webhook events — never from client-side callbacks.

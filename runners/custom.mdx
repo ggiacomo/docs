@@ -28,8 +28,8 @@ When the agent receives a command, the runner:
 1. Spawns the binary as a child process
 2. Writes the prompt string to the process's stdin
 3. Closes the stdin stream (signals EOF to the binary)
-4. Reads stdout progressively and publishes chunks to the Redis output channel
-5. Waits for the process to exit, then publishes the `done` event
+4. Reads stdout progressively and forwards chunks to Telegram in real time
+5. Waits for the process to exit, then marks the session as done
 
 Your binary should write output as it produces it (don't buffer everything until the end) for the best streaming experience in Telegram.
 

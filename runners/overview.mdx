@@ -30,19 +30,25 @@ A **runner** is the AI engine that processes your prompts. RemoteAgent acts as t
 
 ## How to select a runner
 
-Pass the `--runner` flag to `remoteagent init`:
+Run `remoteagent init` and the wizard will show an interactive list — use the arrow keys to pick a runner, then press Enter:
 
-```bash
-remoteagent init --runner claude-code    # default
-remoteagent init --runner claude-sdk
-remoteagent init --runner opencode
-remoteagent init --runner gemini
-remoteagent init --runner aider
-remoteagent init --runner openclaw
-remoteagent init --runner custom --runner-bin /path/to/binary
+```
+AI runner:
+❯ claude-code  — claude CLI binary
+  claude-sdk   — Claude Code SDK
+  gemini       — Gemini CLI binary
+  opencode     — OpenCode AI (no API key required)
+  aider        — Aider CLI
+  openclaw     — OpenClaw (local gateway, port 18789) [beta]
+  custom       — Custom binary
 ```
 
-Without a flag, the wizard prompts you interactively. `claude-code` is listed first and is the default.
+If you already know which runner you want, you can skip the prompt by passing `--runner`:
+
+```bash
+remoteagent init --runner opencode
+remoteagent init --runner custom --runner-bin /path/to/binary
+```
 
 ## Switching runners
 
@@ -56,7 +62,7 @@ remoteagent start
 
 ## Runner architecture
 
-All runners implement the same interface internally. When the agent receives a command from the Redis channel, it calls the runner with the prompt and streams chunks back as they are produced. The runner is responsible for:
+All runners implement the same interface internally. When the agent receives a command, it calls the runner with the prompt and streams chunks back as they are produced. The runner is responsible for:
 
 1. Receiving the prompt string
 2. Invoking the AI model (in-process, via subprocess, or via HTTP)

@@ -1,9 +1,9 @@
 ---
 title: "claude-sdk"
-description: "The default runner. Uses the official @anthropic-ai/claude-code SDK in-process for the best performance and capability."
+description: "Uses the official @anthropic-ai/claude-code SDK in-process for the lowest latency with Anthropic models."
 ---
 
-The `claude-sdk` runner is the default and recommended choice for most users. It uses Anthropic's `@anthropic-ai/claude-code` Node.js SDK directly within the agent process — no subprocess, no CLI binary, no shell invocation. The model runs in-process, which means lower latency, better error handling, and access to the full SDK feature set including tool use and streaming.
+The `claude-sdk` runner uses Anthropic's `@anthropic-ai/claude-code` Node.js SDK directly within the agent process — no subprocess, no CLI binary, no shell invocation. The model runs in-process, which means lower latency, better error handling, and access to the full SDK feature set including tool use and streaming.
 
 ## Requirements
 
@@ -12,7 +12,7 @@ The `claude-sdk` runner is the default and recommended choice for most users. It
 
 ## Setup
 
-During `remoteagent init`, select `claude-sdk` (or press Enter to accept the default). When prompted for your API key, paste your Anthropic key:
+During `remoteagent init`, choose `claude-sdk` from the interactive list. When prompted for your API key, paste your Anthropic key:
 
 ```bash
 remoteagent init
@@ -30,13 +30,13 @@ remoteagent init --runner claude-sdk
 
 ## How it works
 
-When your agent receives a command from the Redis channel, the `claude-sdk` runner calls the `@anthropic-ai/claude-code` SDK with the prompt and the current working directory. The SDK handles:
+When your agent receives a command, the `claude-sdk` runner calls the `@anthropic-ai/claude-code` SDK with the prompt and the current working directory. The SDK handles:
 
 - Model selection (latest Claude model configured in the SDK)
 - Tool use (file read/write, bash execution, etc.)
 - Streaming output chunks back to the agent
 
-Each chunk is published to the output Redis channel as it arrives, so Telegram receives the response progressively rather than waiting for the full completion.
+Each chunk is forwarded to Telegram as it arrives, so you see the response progressively rather than waiting for the full completion.
 
 ## Pros and cons
 

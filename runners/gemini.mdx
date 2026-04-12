@@ -53,7 +53,7 @@ The runner executes:
 gemini "<prompt>"
 ```
 
-Output is captured from stdout and streamed back to the Redis channel. The Gemini CLI writes its response progressively, so Telegram receives chunks as they arrive.
+Output is captured from stdout and forwarded to Telegram progressively as it arrives.
 
 ## Free tier limits
 

@@ -39,11 +39,7 @@ remoteagent x.y.z
 
 RemoteAgent itself has no additional dependencies. However, the AI runner you choose may require its own tooling installed separately.
 
-### claude-sdk (default)
-
-No additional binary needed. The runner uses the `@anthropic-ai/claude-code` SDK in-process. You will need an **Anthropic API key**, which you provide during `remoteagent init` and is stored locally in `~/.remoteagent/config.json`.
-
-### claude-code
+### claude-code (default)
 
 Requires the `claude` CLI binary:
 
@@ -52,7 +48,11 @@ npm install -g @anthropic-ai/claude-code
 claude --version
 ```
 
-You also need an Anthropic API key. The `claude` binary reads it from the same local config.
+Authenticate with a Claude Pro or Max subscription (no API key needed) or with an Anthropic API key. See the [claude-code runner docs](/runners/claude-code) for all authentication options.
+
+### claude-sdk
+
+No additional binary needed. The runner uses the `@anthropic-ai/claude-code` SDK in-process. You will need an **Anthropic API key**, which you provide during `remoteagent init` and is stored locally in `~/.remoteagent/config.json`.
 
 ### gemini
 

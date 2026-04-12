@@ -38,7 +38,7 @@ The setup takes under five minutes. Download the binary, get a pairing code from
 3. You run `remoteagent init` in your project directory, choose your AI runner, and paste the pairing code when prompted. The agent is now linked to your Telegram bot.
 4. From that point on, any message you send to the bot is forwarded to your agent. Output streams back to Telegram as it is produced.
 
-The relay uses Redis pub/sub channels scoped to your agent ID. The web app (running on Vercel) receives Telegram webhooks, publishes commands to Redis, and subscribes to the output channel to forward chunks back to Telegram. Your local agent subscribes to its own command channel and publishes output. No polling, no persistent connections from the server side.
+The relay is event-driven — no polling, no persistent connections from the server side. See [Architecture](/under-the-hood/architecture) for a detailed breakdown.
 
 ## Compatibility
 

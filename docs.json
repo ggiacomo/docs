@@ -45,11 +45,11 @@
             "group": "Runners",
             "pages": [
               "runners/overview",
-              "runners/claude-sdk",
               "runners/claude-code",
+              "runners/claude-sdk",
+              "runners/opencode",
               "runners/gemini",
               "runners/aider",
-              "runners/opencode",
               "runners/openclaw",
               "runners/custom"
             ]

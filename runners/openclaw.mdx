@@ -50,7 +50,7 @@ RemoteAgent does not configure any OpenClaw settings — all model routing, API 
 
 ## How it works
 
-The runner sends POST requests to `http://localhost:{port}/v1/chat/completions` using the OpenAI API format. The port is configurable and saved in `~/.remoteagent/agents/{agentId}.json`. The prompt is sent as a user message. Response chunks are streamed via server-sent events (SSE) and forwarded to the Redis output channel as they arrive.
+The runner sends POST requests to `http://localhost:{port}/v1/chat/completions` using the OpenAI API format. The port is configurable and saved in `~/.remoteagent/agents/{agentId}.json`. The prompt is sent as a user message. Response chunks are streamed via server-sent events (SSE) and forwarded to Telegram as they arrive.
 
 Example request body sent by the runner:
 

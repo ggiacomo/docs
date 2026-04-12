@@ -101,9 +101,7 @@ One file per paired agent:
   "agentToken": "...",
   "projectPath": "/home/you/my-project",
   "projectName": "my-project",
-  "runner": "claude-sdk",
-  "redisUrl": "rediss://...",
-  "apiBaseUrl": "https://remoteagent.chat"
+  "runner": "claude-code"
 }
 ```
 
@@ -116,6 +114,6 @@ remoteagent config --agent a1b2c3d4 --name new-name
 
 <Note>
   Neither file is ever read by the RemoteAgent servers. The `agentToken` is a
-  JWT used only to authenticate the Redis relay channel — it does not grant
+  signed credential used only to authenticate the relay — it does not grant
   access to your files, source code, or API keys.
 </Note>

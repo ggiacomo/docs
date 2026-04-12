@@ -17,17 +17,21 @@ description: "Answers to common questions about RemoteAgent setup, security, bil
   </Accordion>
 
   <Accordion title="Which runner should I choose?">
-    Start with `claude-sdk` — it is the default for a reason. It has the best code understanding, the most capable tool use (file read/write, bash execution), and the lowest latency since it runs in-process with no subprocess overhead. It requires an Anthropic API key.
+    Start with `claude-code` — it uses the Claude CLI and gives you full Claude capability. If you already have Claude installed and authenticated, it works with no additional API key.
 
-    If you want a free option with no credit card, try `gemini` — the Google Gemini CLI has a free tier. Note that it is currently in beta.
+    If you want the lowest latency and are happy managing an Anthropic API key directly, `claude-sdk` runs in-process with no subprocess overhead.
+
+    If you want a free option with no API key at all, try `opencode` — it supports 75+ providers including GitHub Copilot and local models, and works out of the box with no configuration.
+
+    If you want a free option with Gemini models, try `gemini` — the Google Gemini CLI has a free tier. Note that it is currently in beta.
 
     If you need multi-model flexibility or want to use local models via Ollama, `aider` is the right choice. It requires Python.
 
-    If you have a custom tool or internal AI gateway, use `custom` or `openclaw`.
+    If you have a custom tool or internal AI gateway, use the `custom` runner.
   </Accordion>
 
   <Accordion title="Is my API key safe?">
-    Yes. Your API key is stored in `~/.remoteagent/config.json` on your local machine and is **never transmitted to RemoteAgent servers**. The agent calls the AI model API (Anthropic, Google, etc.) directly from your machine. RemoteAgent only sees the prompt you sent via Telegram, not the full conversation context or your credentials.
+    Yes. Your API key is stored in `~/.remoteagent/config.json` on your local machine and is **never transmitted to RemoteAgent servers**. The agent calls the AI model API directly from your machine. RemoteAgent only sees the prompt you sent via Telegram, not the full conversation context or your credentials.
 
     For additional security, set restrictive permissions on the config file:
 
@@ -43,7 +47,7 @@ description: "Answers to common questions about RemoteAgent setup, security, bil
     - **Trial / Pro** — unlimited projects
     - **Solo** — up to 3 projects
 
-    When multiple agents are online, the bot asks which project to target when you send a command. You can also send `/projects` to see the list and tap to switch.
+    When multiple agents are online, commands go to the currently active project. Send `/projects` to see the list and switch.
   </Accordion>
 
   <Accordion title="What happens when my trial ends?">
@@ -53,9 +57,7 @@ description: "Answers to common questions about RemoteAgent setup, security, bil
   </Accordion>
 
   <Accordion title="Can I self-host RemoteAgent?">
-    Not currently. The relay infrastructure (web app, Redis, database) runs on RemoteAgent's managed stack. However, the relay is designed to be transparent — it does not inspect your code or store sensitive data beyond a prompt preview. The agent package itself is open source and runs entirely on your machine.
-
-    Self-hosting support may be added in the future.
+    Not currently. The relay infrastructure runs on RemoteAgent's managed stack. The relay is designed to be transparent — it does not inspect your code or store sensitive data beyond a prompt preview. The agent package itself runs entirely on your machine.
   </Accordion>
 
   <Accordion title="What if my agent goes offline?">
@@ -69,20 +71,13 @@ description: "Answers to common questions about RemoteAgent setup, security, bil
   </Accordion>
 
   <Accordion title="How do I update the agent?">
-    Re-run the installer to get the latest version:
+    Run the reinstall command — it updates to the latest version and restarts any running agents automatically:
 
     ```bash
-    curl -fsSL https://remoteagent.chat/install | bash
-    remoteagent --version
+    remoteagent reinstall
     ```
 
-    Then restart the agent:
-
-    ```bash
-    remoteagent start
-    ```
-
-    Updates to the agent package are backward-compatible. Your existing config files and paired agents continue to work after an update.
+    Your existing config files and paired agents continue to work after an update.
   </Accordion>
 
   <Accordion title="Can multiple Telegram users control the same agent?">
@@ -90,22 +85,21 @@ description: "Answers to common questions about RemoteAgent setup, security, bil
   </Accordion>
 
   <Accordion title="How do I revoke access to a paired agent?">
-    Delete the agent from the [dashboard](https://remoteagent.chat/dashboard). This invalidates the agent's JWT and removes it from the database. The agent process will continue running locally but will no longer be able to receive commands or authenticate with Redis.
+    Delete the agent from the [dashboard](https://remoteagent.chat/dashboard). This immediately invalidates the agent's credentials — it will no longer be able to receive commands even if the process is still running locally.
 
-    To fully clean up, stop the agent process and remove the local config:
+    To fully clean up, also stop the agent process on your machine:
 
     ```bash
-    # Stop the agent (Ctrl+C or kill the process)
-    rm ~/.remoteagent/agents/{agentId}.json
+    remoteagent remove "project-name"
     ```
   </Accordion>
 
   <Accordion title="What data does RemoteAgent store?">
     RemoteAgent stores:
 
-    - Your Telegram user ID and username (from the Telegram Login Widget)
-    - Your plan and billing status (from Stripe)
-    - Agent metadata: project name, machine hostname, last-seen timestamp, online/offline status
+    - Your Telegram user ID and username
+    - Your plan and billing status
+    - Agent metadata: project name, last-seen timestamp, online/offline status
     - Session records: start time, end time, status, and the first 200 characters of your prompt
 
     RemoteAgent does not store:

@@ -1,123 +1,62 @@
 ---
 title: "Architecture"
-description: "How RemoteAgent works under the hood — the full message flow from Telegram to your agent and back."
+description: "How RemoteAgent works — the message flow from Telegram to your agent and back."
 ---
 
-RemoteAgent is built on a serverless-first architecture. There is no custom server running 24/7 to maintain, no daemon process on the cloud side, and no persistent connection between Telegram and your agent. Everything is event-driven and stateless except for the local agent process on your machine.
+RemoteAgent is built on a serverless-first architecture. There is no custom server to maintain on the cloud side, and no persistent connection between Telegram and your machine. Everything is event-driven.
+
+## Components
+
+**RemoteAgent cloud** — a serverless web app that handles Telegram webhook events, authenticates requests, and relays messages. It has no persistent state beyond what's in the database.
+
+**Message broker** — a managed pub/sub layer that decouples the cloud from your agent. Messages flow in real time without polling.
+
+**Your agent** — the only persistent process in the system. It runs on your machine, listens for incoming commands, calls your AI runner, and streams output back.
 
 ## Message flow
 
-The complete path of a message from your phone to your agent and back:
-
 ```
-You (Telegram app)
+You (Telegram)
      │
-     │ HTTPS POST
      ▼
 Telegram servers
-     │
-     │ HTTPS POST (webhook)
+     │  webhook
      ▼
-Vercel — /api/telegram
-  [Grammy.js verifies HMAC-SHA256 signature]
-  [Identifies your user ID and target agent]
-  [Publishes command to Redis channel]
-     │
-     │ Redis PUBLISH
-     │ channel: agent:{agentId}
-     ▼
-Redis (Upstash)
-     │
-     │ Redis SUBSCRIBE (long-lived, in your agent process)
-     ▼
-Your machine — remoteagent process
-  [Receives command event]
-  [Calls AI runner with prompt + working directory]
-  [Streams output chunks as they are produced]
-     │
-     │ Redis PUBLISH (per chunk)
-     │ channel: output:{sessionId}
-     ▼
-Redis (Upstash)
-     │
-     │ Redis SUBSCRIBE (Vercel function, per session)
-     ▼
-Vercel — output forwarder
-  [Receives chunk events]
-  [Calls Telegram Bot API to send/edit messages]
-     │
-     │ HTTPS POST
-     ▼
-Telegram servers
+RemoteAgent cloud
+  — verifies request authenticity
+  — identifies the target agent
+  — publishes command to message broker
      │
      ▼
-You (Telegram app) — see output streaming in real time
+Message broker
+     │
+     ▼
+Your machine (agent process)
+  — receives command
+  — calls AI runner with the prompt
+  — streams output chunks as produced
+     │
+     ▼
+Message broker
+     │
+     ▼
+RemoteAgent cloud
+  — forwards each chunk to Telegram
+     │
+     ▼
+You (Telegram) — output streams in real time
 ```
 
-## Serverless-first design
+## Design principles
 
-The web app runs entirely on Vercel as serverless functions. There is no always-on server process on the cloud side:
+**Your API key never leaves your machine.** The agent calls your AI runner locally. No credentials are transmitted to RemoteAgent servers.
 
-- **Telegram webhook** — Vercel function wakes on each incoming message, processes it, publishes to Redis, and exits.
-- **Output forwarder** — a separate Vercel function subscribes to the output Redis channel for the duration of a session and forwards chunks to Telegram.
-- **Cron jobs** — Vercel cron invocations for trial reminder notifications.
+**Serverless on the cloud side.** The web app wakes on each incoming event, processes it, and exits. There is no always-on server process to maintain or scale.
 
-The only persistent process in the entire system is the **agent on your machine**. It maintains long-lived Redis subscriptions and runs the AI runner when commands arrive.
+**The agent is the only stateful piece.** It maintains a persistent connection to the message broker and manages runner lifecycle. Everything else is stateless.
 
-## The agent on your machine
+## Pairing
 
-The agent is a self-contained binary that:
+Pairing links your local agent to your Telegram account. You generate a short-lived code from the dashboard, enter it during `remoteagent init`, and the two sides exchange credentials over an authenticated channel. The code expires after 10 minutes and is single-use.
 
-1. Subscribes to `agent:{agentId}` on Redis at startup.
-2. On receiving a `command` event, calls the configured AI runner with the prompt.
-3. Streams output chunks back to `output:{sessionId}` as the runner produces them.
-4. Sends a `done` event when the runner finishes.
-5. On receiving an `abort` event, kills the runner process and publishes a `done` event.
-
-The agent process never initiates outbound connections to Telegram or to the RemoteAgent web app — it only communicates via Redis channels.
-
-## Why Redis pub/sub?
-
-Redis pub/sub provides:
-
-- **Low latency** — typically under 10ms for a message to travel from publisher to subscriber.
-- **Streaming-friendly** — publish individual chunks as they are produced, subscribe and forward immediately.
-- **Stateless relay** — the Redis server does not need to store messages; subscribers receive them in real time or miss them. No database required for the relay layer.
-- **Serverless compatible** — Vercel functions can subscribe to a Redis channel for the duration of a request without holding a persistent connection from a dedicated server.
-
-## Database
-
-PostgreSQL (via Neon) stores persistent state:
-
-- `users` — Telegram user ID, plan, subscription status
-- `agents` — agent metadata, token hash, online/offline status
-- `sessions` — session records with prompt preview and status
-- `pairing_codes` — short-lived codes with TTL and single-use enforcement
-
-The database is not involved in the real-time message relay path. It is only read/written for authentication, session tracking, and plan enforcement.
-
-## Pairing flow
-
-```
-1. User opens remoteagent.chat/dashboard
-   → Authenticates with Telegram Login Widget (user ID verified by Telegram)
-   → Clicks "Pair new agent", enters project name
-   → POST /api/pair { projectName }
-   → Server generates pairing code, stores in DB with 10-minute TTL
-   → Dashboard displays code: "XK9-4TZ"
-
-2. remoteagent init (on your machine)
-   → Interactive wizard: runner, API key, pairing code
-   → User pastes the code from the dashboard
-   → CLI → POST /api/pair/confirm { code }
-   → Server verifies code, creates agent record, issues JWT
-   → Publishes { event: "paired", payload: { agentToken, agentId } } to Redis
-
-3. Agent CLI receives "paired" event
-   → Saves JWT and agentId to ~/.remoteagent/agents/{agentId}.json
-   → Confirms pairing in terminal
-
-4. Agent starts
-   → Subscribes to agent:{agentId} with JWT-authenticated connection
-   → Ready to receive commands
-```
+Once paired, the agent authenticates directly with the message broker using a token tied to your account. The pairing code is never used again.

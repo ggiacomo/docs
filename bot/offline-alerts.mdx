@@ -7,7 +7,7 @@ RemoteAgent monitors the connection status of your agents in real time. When an 
 
 ## How it works
 
-When an agent starts, it establishes a subscription to its Redis command channel. The web app tracks the agent's heartbeat. If the heartbeat stops (the agent disconnects without sending a graceful shutdown), the agent's status is set to `offline` in the database and the bot sends you a message:
+When an agent starts, it establishes a connection to the relay. The relay tracks the agent's heartbeat. If the heartbeat stops (the agent disconnects without sending a graceful shutdown), the bot sends you a message:
 
 ```
 Your agent "my-api" went offline.
@@ -33,7 +33,7 @@ Or by project name from any directory:
 remoteagent start "my-api"
 ```
 
-The agent reconnects to the Redis channel and immediately resumes accepting commands. The bot sends a confirmation:
+The agent reconnects and immediately resumes accepting commands. The bot sends a confirmation:
 
 ```
 Your agent "my-api" is back online.
@@ -41,7 +41,7 @@ Your agent "my-api" is back online.
 
 ## Automatic reconnection
 
-The agent has built-in reconnection logic. If the Redis connection drops temporarily (e.g., a brief network blip), the agent attempts to reconnect automatically with exponential backoff. You will only receive an offline alert if the connection cannot be restored within the reconnection window.
+The agent has built-in reconnection logic. If the connection drops temporarily (e.g., a brief network blip), the agent attempts to reconnect automatically with exponential backoff. You will only receive an offline alert if the connection cannot be restored within the reconnection window.
 
 This means transient network issues are handled silently — you only get notified for meaningful outages.
 

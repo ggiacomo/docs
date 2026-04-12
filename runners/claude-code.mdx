@@ -1,9 +1,9 @@
 ---
 title: "claude-code"
-description: "Run Claude Code as an external CLI binary instead of the in-process SDK."
+description: "The default runner. Uses the Claude CLI binary with OAuth token or subscription login — no API key required with a Claude Pro or Max plan."
 ---
 
-The `claude-code` runner invokes the `claude` CLI binary as a subprocess rather than using the SDK in-process. This produces the same model output as `claude-sdk` but runs in a separate process, which can be useful for isolation, reproducibility, or when you want full control over the `claude` binary version independently of the RemoteAgent package.
+The `claude-code` runner invokes the `claude` CLI binary as a subprocess. It is the default runner because it works with a **Claude Pro or Max subscription** — no Anthropic API key required. If you already pay for Claude, you can use `claude-code` at no additional cost.
 
 ## Requirements
 
@@ -13,7 +13,7 @@ The `claude-code` runner invokes the `claude` CLI binary as a subprocess rather 
   npm install -g @anthropic-ai/claude-code
   ```
 
-- Authentication — either a **long-lived OAuth token** (recommended) or an interactive login via `claude login`. See [Authentication](#authentication) below.
+- Authentication — see [Authentication](#authentication) below.
 
 Verify the binary is available:
 
@@ -21,19 +21,11 @@ Verify the binary is available:
 claude --version
 ```
 
-## Setup
-
-```bash
-remoteagent init --runner claude-code
-```
-
-Or choose `claude-code` when prompted by the interactive wizard.
-
 ## Authentication
 
-The `claude` binary must be authenticated before the agent can use it. There are two methods:
+The `claude` binary must be authenticated before the agent can use it. There are three options:
 
-### Option A — Long-lived OAuth token (recommended)
+### Option A — Long-lived OAuth token (recommended for servers)
 
 Generate a token once with:
 
@@ -41,66 +33,61 @@ Generate a token once with:
 claude setup-token
 ```
 
-This creates a token of the form `sk-ant-oat01-xxxxx...xxxxx` that is **valid for one year** and works on any machine without re-login.
+This creates a token (of the form `sk-ant-oat01-...`) that is **valid for one year** and works on any machine without re-login. It is the best option for running the agent on a remote server or a machine you cannot easily log in to interactively.
 
 <Warning>
   `claude setup-token` requires an active **Claude Pro or Max** subscription.
   The token is shown only once — copy it immediately before closing the terminal.
 </Warning>
 
-During `remoteagent init`, the wizard will ask for this token and store it securely in `~/.remoteagent/agents/{agentId}.json`. The token is injected as the `CLAUDE_CODE_OAUTH_TOKEN` environment variable each time the `claude` binary is invoked — no shell export needed.
+During `remoteagent init`, the wizard will ask for this token and store it in the agent config. The token is injected automatically each time the `claude` binary is invoked — no shell export needed.
 
-### Option B — Interactive login (fallback)
+### Option B — Interactive login
 
-If you do not have a Pro/Max subscription, authenticate with:
+Authenticate interactively on the machine where the agent runs:
 
 ```bash
 claude login
 ```
 
-This stores a session credential managed by the `claude` CLI itself. Sessions expire periodically and must be renewed manually by running `claude login` again on the same machine.
+This stores a session credential managed by the `claude` CLI itself. Sessions expire periodically and must be renewed manually by running `claude login` again on the same machine. Best for local development machines you have direct access to.
 
-<Note>
-  The interactive login must be performed on the same machine where the agent runs.
-  It is not portable across machines, unlike the OAuth token.
-</Note>
-
-### Option C — API key via environment variable
+### Option C — API key
 
 If you have an `ANTHROPIC_API_KEY` set in your environment, the `claude` binary will use it automatically.
 
 <Warning>
   `ANTHROPIC_API_KEY` takes **precedence over your subscription** — it overrides
-  both the OAuth token and `claude login`, even if you have an active Pro/Max plan.
-  If you want to authenticate via subscription, make sure `ANTHROPIC_API_KEY` is
-  **not set** in your environment (or in `~/.zshrc` / `~/.bash_profile`).
+  both the OAuth token and `claude login`, even with an active Pro/Max plan.
+  Unset it if you want to authenticate via subscription:
+
+  ```bash
+  unset ANTHROPIC_API_KEY
+  ```
 </Warning>
+
+## Setup
+
+```bash
+remoteagent init --runner claude-code
+```
+
+Or just press Enter when the runner wizard appears — `claude-code` is the default.
+
+## Token expiry
+
+The dashboard shows a warning when your OAuth token is close to expiring. To renew it, run `claude setup-token` again on the same machine and re-run `remoteagent init` to update the stored token.
 
 ## Difference from claude-sdk
 
-Both runners use the same underlying Claude model and produce equivalent output. The key differences are:
-
-| | claude-sdk | claude-code |
+| | claude-code | claude-sdk |
 |---|---|---|
-| Execution | In-process (Node.js) | Subprocess (`claude` binary) |
-| Startup overhead | None | ~200–500ms per invocation |
-| Process isolation | Shared with agent | Separate OS process |
-| Binary version control | Tied to SDK version in package | Independent — update with `npm update -g @anthropic-ai/claude-code` |
-| Error output | Structured SDK errors | Raw CLI stderr |
+| Auth | OAuth token or `claude login` (subscription) | Anthropic API key |
+| API cost | Included in Pro/Max subscription | Billed per token |
+| Execution | Subprocess (`claude` binary) | In-process (Node.js SDK) |
+| Startup overhead | ~200–500ms per invocation | None |
 
-For most users, `claude-sdk` is the better choice. Use `claude-code` if you specifically need process isolation or want to pin the `claude` binary to a particular version.
-
-## How it works
-
-The runner executes:
-
-```bash
-claude -p "<prompt>" --dangerously-skip-permissions
-```
-
-The `--dangerously-skip-permissions` flag is required because the agent runs non-interactively — there is no user present to approve individual tool calls. RemoteAgent runs this on your own machine, so the permissions boundary is the same as running `claude` manually.
-
-Output is captured from stdout and streamed back to the Redis output channel chunk by chunk.
+Use `claude-sdk` if you prefer direct API access and per-token billing over a subscription.
 
 ## Updating the binary
 

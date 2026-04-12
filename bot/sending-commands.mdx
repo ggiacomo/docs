@@ -50,7 +50,7 @@ If you want to stop the agent mid-task — for example, if it is taking too long
 abort
 ```
 
-The agent receives the abort signal via the Redis channel and terminates the current runner process. You receive a confirmation message. The agent then returns to the idle state and is ready for the next command.
+The agent receives the abort signal and terminates the current runner process. You receive a confirmation message. The agent then returns to the idle state and is ready for the next command.
 
 <Warning>
   Aborting stops the AI mid-execution. If the runner was in the middle of
@@ -100,7 +100,7 @@ Create a new API endpoint GET /api/stats that returns total session count for th
 ### Explanation
 
 ```
-Explain what the realtime.ts file does and how it connects to Redis
+Explain what the realtime.ts file does
 ```
 
 ```

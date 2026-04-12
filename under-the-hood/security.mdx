@@ -11,10 +11,10 @@ RemoteAgent is a pure relay. It routes messages between Telegram and your local 
 
 - Store your prompts or AI responses (only a 200-character preview for the session list)
 - Read your source code
-- See your Anthropic, OpenAI, or any other AI API key
+- See your AI API keys
 - Execute code on your behalf
 
-Your AI runner calls the model API directly from your machine, using credentials stored only in `~/.remoteagent/config.json`. The RemoteAgent servers see a Redis message containing the prompt you sent via Telegram — they do not process it, interpret it, or log it beyond the preview.
+Your AI runner calls the model API directly from your machine, using credentials stored only on your machine. The RemoteAgent servers relay the prompt you sent via Telegram — they do not process it, interpret it, or log it beyond the preview.
 
 <Warning>
   Do not include sensitive secrets in your Telegram commands. While the relay
@@ -26,8 +26,8 @@ Your AI runner calls the model API directly from your machine, using credentials
 
 API keys are stored locally in:
 
-- `~/.remoteagent/config.json` — global config (e.g., Anthropic API key)
-- `~/.remoteagent/agents/{agentId}.json` — per-agent config
+- `~/.remoteagent/config.json` — global config
+- `~/.remoteagent/agents/` — per-agent config files
 
 These files are written by `remoteagent init` and read only by the local agent process. They are never uploaded, synced, or referenced by any network request made by the relay.
 
@@ -39,64 +39,51 @@ chmod 600 ~/.remoteagent/config.json
 chmod 600 ~/.remoteagent/agents/*.json
 ```
 
-## Agent authentication (JWT)
+## Agent authentication
 
-When you complete pairing, the server issues a JWT (signed with a secret known only to the server). This token is stored in the per-agent config and used to authenticate the agent's Redis subscriptions.
-
-The JWT:
-- Identifies the agent by its `agentId`
-- Scopes the agent's access to its own Redis channels only
-- Does not grant access to other users' agents or data
-- Can be revoked by deleting the agent from the dashboard
+When you complete pairing, the server issues a signed token stored in the per-agent config. This token authenticates the agent's connection to the message broker and scopes it strictly to its own channels — an agent cannot access another agent's messages or data. Tokens can be revoked by deleting the agent from the dashboard.
 
 ## Telegram webhook verification
 
-Every POST request to `/api/telegram` is verified using **HMAC-SHA256** before any processing occurs. The signature is computed using the `TELEGRAM_WEBHOOK_SECRET` (set in Vercel environment variables) and compared against the `X-Telegram-Bot-Api-Secret-Token` header Telegram sends with each request.
-
-Requests that fail signature verification are rejected with a 401 response before Grammy.js processes them.
+Every incoming message from Telegram is verified using a cryptographic signature before any processing occurs. Requests that fail verification are rejected immediately.
 
 ## Telegram user authorization
 
-The bot checks the Telegram user ID of every incoming message against the list of authorized users for your account. Messages from unauthorized user IDs are silently ignored — no error response is sent, which avoids leaking information about which user IDs are registered.
+The bot checks the Telegram user ID of every incoming message against the authorized users for your account. Messages from unauthorized IDs are silently ignored — no error response is sent, which avoids leaking information about which user IDs are registered.
 
-This check runs before any command is published to Redis, so unauthorized messages never reach your agent.
+This check runs before the command reaches your agent, so unauthorized messages are dropped at the gateway.
 
 ## Pairing code security
 
 Pairing codes are:
 
 - **Short-lived** — expire after 10 minutes
-- **Single-use** — marked as used immediately on first redemption; replaying the same code returns an error
+- **Single-use** — marked as used immediately on first redemption
 - **Unpredictable** — generated with cryptographically secure randomness
-- **Not reusable** — deleted from the database after use
 
-The pairing flow requires the user to authenticate with the Telegram Login Widget before entering the code. This binds the agent to a verified Telegram user ID, not just anyone who happens to have the code.
+The pairing flow requires Telegram authentication before the code can be redeemed. This binds the agent to a verified Telegram identity, not just anyone who has the code.
 
-## Redis channel isolation
+## Channel isolation
 
-Each agent subscribes only to its own channel (`agent:{agentId}`). The agent ID is derived from the JWT payload, which is verified on every subscription. An agent cannot subscribe to another agent's channel.
+Each agent communicates only on its own private channel, derived from its token. An agent cannot read or write to another agent's channel. Session output channels are similarly scoped and unknown to other users.
 
-Output channels (`output:{sessionId}`) are keyed by session ID, which is generated server-side and unknown to other users.
+## Payment webhook verification
 
-## Stripe webhook verification
-
-Every POST to `/api/stripe/webhook` uses `stripe.webhooks.constructEvent()` with the webhook signing secret from Stripe Dashboard. This verifies that the event genuinely originated from Stripe and has not been tampered with.
-
-Plan updates are only applied after a verified Stripe webhook event — never based on redirect URLs, client-side callbacks, or untrusted inputs.
+Billing events are verified against a signing secret before any plan changes are applied. Plan updates are only applied after a verified webhook event — never based on redirect URLs, client-side callbacks, or untrusted inputs.
 
 ## Rate limiting
 
-The `/api/telegram` endpoint enforces rate limiting per Telegram user ID: a maximum of 10 requests per minute. Requests exceeding this limit receive a 429 response. This prevents abuse of the relay by scripts or bots flooding the system with commands.
+The message endpoint enforces rate limiting per Telegram user ID. Requests exceeding the limit are rejected. This prevents abuse of the relay by scripts or bots flooding the system with commands.
 
 ## Summary
 
 | Security control | Implementation |
 |---|---|
 | API key isolation | Stored locally, never transmitted |
-| Agent authentication | JWT, server-signed, scoped per agent |
-| Telegram webhook integrity | HMAC-SHA256 on every request |
+| Agent authentication | Signed token, scoped per agent |
+| Webhook integrity | Cryptographic signature on every request |
 | User authorization | Telegram user ID check before every command |
 | Pairing code | 10-min TTL, single-use, cryptographically random |
-| Redis channel isolation | Channels keyed by agentId, JWT-verified |
-| Stripe webhook integrity | `constructEvent()` with signing secret |
-| Rate limiting | 10 req/min per Telegram user |
+| Channel isolation | Private channels per agent, token-verified |
+| Payment integrity | Signed webhook events only |
+| Rate limiting | Per user ID, enforced at the gateway |

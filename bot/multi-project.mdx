@@ -51,17 +51,7 @@ The name matches the project name you assigned during `remoteagent init`.
 When you send a message to the bot, routing works as follows:
 
 - **One agent online** — the command is sent directly to that agent, no selection needed.
-- **Multiple agents online** — the bot asks you which project to target:
-
-  ```
-  Which project?
-  [1] my-api (online)
-  [2] frontend (online)
-  [3] data-pipeline (offline)
-  ```
-
-  Reply with the number to select a project. The bot remembers your last selection within a session, so you do not need to re-select for every message until you explicitly switch.
-
+- **Multiple agents online** — the command is sent to the currently active project. There is always one project selected; use `/projects` to switch.
 - **All agents offline** — the bot notifies you that no agents are reachable and suggests running `remoteagent start`.
 
 ## Switching the active project
