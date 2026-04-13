@@ -31,12 +31,13 @@ description: "Answers to common questions about RemoteAgent setup, security, bil
   </Accordion>
 
   <Accordion title="Is my API key safe?">
-    Yes. Your API key is stored in `~/.remoteagent/config.json` on your local machine and is **never transmitted to RemoteAgent servers**. The agent calls the AI model API directly from your machine. RemoteAgent only sees the prompt you sent via Telegram, not the full conversation context or your credentials.
+    Yes. Your API key is stored in `~/.remoteagent/agents/{agentId}.json` on your local machine and is **never transmitted to RemoteAgent servers**. The agent calls the AI model API directly from your machine. RemoteAgent only sees the prompt you sent via Telegram, not the full conversation context or your credentials.
 
-    For additional security, set restrictive permissions on the config file:
+    For additional security, set restrictive permissions on the config files:
 
     ```bash
-    chmod 600 ~/.remoteagent/config.json
+    chmod 700 ~/.remoteagent
+    chmod 600 ~/.remoteagent/agents/*.json
     ```
   </Accordion>
 

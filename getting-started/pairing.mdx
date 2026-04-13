@@ -73,9 +73,26 @@ If you need to re-pair an agent (for example, after switching Telegram accounts)
 
 After pairing, the agent's credentials are stored in two files on your machine:
 
+### Per-agent config — `~/.remoteagent/agents/{agentId}.json`
+
+One file per paired agent. This is where all agent-specific settings live, including the API key for runners that require one:
+
+```json
+{
+  "agentId": "a1b2c3d4-...",
+  "agentToken": "...",
+  "projectPath": "/home/you/my-project",
+  "projectName": "my-project",
+  "runner": "claude-sdk",
+  "anthropicApiKey": "sk-ant-..."
+}
+```
+
+This means each project can use a **different API key** — useful if you have projects billed to separate Anthropic accounts.
+
 ### Global config — `~/.remoteagent/config.json`
 
-Shared across all agents on the machine:
+Shared across all agents on the machine. Only used as a fallback for `anthropicApiKey` if the per-agent file does not define one:
 
 ```json
 {
@@ -89,20 +106,6 @@ Update it at any time with:
 ```bash
 remoteagent config --api-key sk-ant-...
 remoteagent config --language Italian
-```
-
-### Per-agent config — `~/.remoteagent/agents/{agentId}.json`
-
-One file per paired agent:
-
-```json
-{
-  "agentId": "a1b2c3d4-...",
-  "agentToken": "...",
-  "projectPath": "/home/you/my-project",
-  "projectName": "my-project",
-  "runner": "claude-code"
-}
 ```
 
 Update the project path or name without re-pairing:

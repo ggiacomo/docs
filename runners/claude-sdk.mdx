@@ -20,7 +20,7 @@ remoteagent init
 # ? Anthropic API key: sk-ant-...
 ```
 
-The key is saved to `~/.remoteagent/config.json` on your local machine. It is never transmitted to RemoteAgent servers.
+The key is saved to `~/.remoteagent/agents/{agentId}.json` on your local machine. It is never transmitted to RemoteAgent servers. Each project can use a different key — useful if you have multiple projects billed to separate Anthropic accounts.
 
 To use this runner from the command line without the interactive wizard:
 
@@ -51,7 +51,7 @@ Each chunk is forwarded to Telegram as it arrives, so you see the response progr
 ## API key security
 
 <Warning>
-  Your Anthropic API key is stored locally in `~/.remoteagent/config.json` and
+  Your Anthropic API key is stored locally in `~/.remoteagent/agents/{agentId}.json` and
   is **never** sent to RemoteAgent servers or included in any network request
   made by the relay. The SDK calls Anthropic's API directly from your machine.
 </Warning>
@@ -60,7 +60,7 @@ The key is stored in plain text in the config file. Make sure `~/.remoteagent/` 
 
 ```bash
 chmod 700 ~/.remoteagent
-chmod 600 ~/.remoteagent/config.json
+chmod 600 ~/.remoteagent/agents/*.json
 ```
 
 ## Costs
