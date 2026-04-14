@@ -12,6 +12,7 @@ A **runner** is the AI engine that processes your prompts. RemoteAgent.CHAT acts
 | `claude-code` | CLI binary | Stable | `claude` CLI + auth (OAuth token, `claude login`, or `ANTHROPIC_API_KEY`) | Default choice — full Claude capability, no API key needed with a subscription |
 | `claude-sdk` | In-process SDK | Stable | Anthropic API key | Best latency with Anthropic models |
 | `opencode` | CLI binary | Stable | nothing (or optional API key) | No API key needed, 75+ providers |
+| `codex` | CLI binary | Stable | ChatGPT Plus/Pro/Business/Edu/Enterprise or `CODEX_API_KEY` | OpenAI users, GPT-5 models |
 | `gemini` | CLI binary | Beta | Google account (free tier available) | No-cost option for Gemini models |
 | `aider` | CLI binary | Beta | Python, pip, model API key | model selection + architect mode via wizard |
 | `openclaw` | HTTP gateway | Stable | openclaw daemon running (configure with openclaw's own wizard first) | Self-hosted AI gateway |
@@ -38,6 +39,7 @@ AI runner:
   claude-sdk   — Claude Code SDK
   gemini       — Gemini CLI binary
   opencode     — OpenCode AI (no API key required)
+  codex        — Codex CLI by OpenAI
   aider        — Aider CLI
   openclaw     — OpenClaw (local gateway, port 18789) [beta]
   custom       — Custom binary
@@ -47,6 +49,7 @@ If you already know which runner you want, you can skip the prompt by passing `-
 
 ```bash
 remoteagent init --runner opencode
+remoteagent init --runner codex
 remoteagent init --runner custom --runner-bin /path/to/binary
 ```
 

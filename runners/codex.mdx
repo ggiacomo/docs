@@ -1,0 +1,120 @@
+---
+title: "codex"
+description: "Use Codex CLI by OpenAI as the AI runner — runs codex exec --json non-interactively with structured JSONL output. Supports API key auth or device login with no browser required on the server."
+---
+
+[Codex CLI](https://developers.openai.com/codex/cli) is OpenAI's terminal coding agent, built in Rust. The `codex` runner invokes `codex exec --json --full-auto` as a subprocess and parses its structured JSONL output to stream responses to Telegram in real time.
+
+## Requirements
+
+- Codex CLI installed (`npm install -g @openai/codex`)
+- A ChatGPT Plus, Pro, Business, Edu, or Enterprise subscription **or** a `CODEX_API_KEY` (OpenAI API key)
+
+Install Codex CLI:
+
+```bash
+npm install -g @openai/codex
+```
+
+Verify the installation:
+
+```bash
+codex --version
+```
+
+## Authentication
+
+Codex CLI supports two authentication modes:
+
+### Option A — API key
+
+Set a `CODEX_API_KEY` (your OpenAI API key) during `remoteagent init`. RemoteAgent.CHAT injects it at runtime — no manual environment variable setup required.
+
+### Option B — Device login (no browser on the server needed)
+
+Run `codex login --device-auth`. Codex displays a short URL and a code. Open that URL on **any device** — your phone, laptop, or any browser — and enter the code to authenticate your ChatGPT account. No browser is needed on the server where the agent runs.
+
+```bash
+codex login --device-auth
+```
+
+Credentials are stored in `~/.codex/auth.json` and reused automatically on every subsequent run.
+
+### Option C — Already authenticated
+
+If you have previously logged in with `codex login` or `codex login --device-auth`, you can skip the auth step during `remoteagent init` — the stored credentials will be used automatically.
+
+## Setup
+
+```bash
+remoteagent init --runner codex
+```
+
+Or choose `codex` when prompted by the interactive wizard.
+
+During `remoteagent init`, the wizard will ask:
+
+- **Auth method** — API key, device login (`codex login --device-auth`), or skip if already authenticated
+- **Model** — optional; defaults to `gpt-5.4`. Enter any model ID supported by Codex CLI.
+
+## How it works
+
+The runner executes:
+
+```bash
+codex exec --json --full-auto --skip-git-repo-check -m gpt-5.4 -- "<prompt>"
+```
+
+- `--json` — structured JSONL output on stdout for reliable parsing
+- `--full-auto` — alias for `--sandbox workspace-write`, allows file writes in the working directory
+- `--skip-git-repo-check` — allows running outside of a git repository
+- `-m gpt-5.4` — model selection (gpt-5.4 is the current recommended model)
+- `--` — separator that prevents prompts starting with `-` from being parsed as flags
+
+RemoteAgent.CHAT parses the JSONL event stream and forwards text to Telegram as it arrives:
+
+| Event | Action |
+|---|---|
+| `item.completed` with `type=agent_message` | Stream text to Telegram |
+| `item.completed` with `type=command_execution` | Log tool use |
+| `item.completed` with `type=file_change` | Log tool use |
+| `turn.failed` | Surface error to Telegram |
+| `error` | Capture for diagnostics |
+
+## Pros and cons
+
+| Pros | Cons |
+|---|---|
+| Structured JSONL output — reliable parsing | Requires ChatGPT Plus/Pro or OpenAI API key |
+| Device login — no browser on server needed | Not free (no free tier for Codex CLI) |
+| Full filesystem access in `--full-auto` mode | Requires Codex CLI installed separately |
+| GPT-5 models | — |
+| No API key needed with a ChatGPT subscription | — |
+
+## Model selection
+
+The default model is `gpt-5.4`. To use a different model, specify it during `remoteagent init` or update your agent config:
+
+```json
+// ~/.remoteagent/agents/<agentId>.json
+{
+  "codexModel": "gpt-5.4"
+}
+```
+
+<Note>
+  `gpt-5.3-codex` is deprecated and causes WebSocket reconnect loops. Use `gpt-5.4` or a newer model.
+</Note>
+
+## Updating Codex CLI
+
+```bash
+npm install -g @openai/codex@latest
+codex --version
+```
+
+Restart the agent after updating:
+
+```bash
+remoteagent start
+```

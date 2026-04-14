@@ -49,6 +49,7 @@
               "runners/claude-code",
               "runners/claude-sdk",
               "runners/opencode",
+              "runners/codex",
               "runners/gemini",
               "runners/aider",
               "runners/openclaw",
