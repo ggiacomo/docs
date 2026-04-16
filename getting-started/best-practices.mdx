@@ -18,7 +18,7 @@ npm install -g pm2
 Start your agent via PM2 instead of the built-in background mode:
 
 ```bash
-pm2 start remoteagent --name "remoteagent" -- start
+pm2 start "remoteagent start" --name my-app
 ```
 
 Save the process list and enable startup on boot:
@@ -38,7 +38,7 @@ pm2 logs remoteagent
 ```
 
 <Tip>
-  If you have multiple agents (Pro plan), start each one with a different PM2 name: `pm2 start remoteagent --name "project-a" -- start --agent <agentId>`.
+  If you have multiple agents (Pro plan), start each one by name: `pm2 start "remoteagent start project-a" --name project-a` and `pm2 start "remoteagent start project-b" --name project-b`.
 </Tip>
 
 ---
